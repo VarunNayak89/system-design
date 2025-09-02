@@ -27,10 +27,10 @@ Load balancing is the process of distributing incoming network traffic across mu
 - Distributes requests sequentially across servers.
 - Assumes all servers have equal capacity.
 
-**Example:**
-Request 1 → Server A
-Request 2 → Server B
-Request 3 → Server C
+**Example:**  
+Request 1 → Server A   
+Request 2 → Server B  
+Request 3 → Server C  
 Request 4 → Server A (repeats)
 
 
@@ -42,10 +42,10 @@ Request 4 → Server A (repeats)
 ### 2. **Least Connections**
 - Sends traffic to the server with the **fewest active connections**.
 
-**Example:**
-Server A: 10 connections
-Server B: 5 connections
-Server C: 2 connections → Next request goes here
+**Example:**  
+Server A: 10 connections  
+Server B: 5 connections  
+Server C: 2 connections → Next request goes here  
 
 
 **Pros:** Dynamic load awareness  
