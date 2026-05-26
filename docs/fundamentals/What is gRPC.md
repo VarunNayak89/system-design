@@ -36,6 +36,18 @@ Instead of calling a REST API over HTTP/JSON, with **gRPC**, you're calling a fu
 | **Language Support** | Multi-language auto-gen | Manual SDKs needed |
 | **Use Case Fit** | Microservices, low-latency | Public APIs, browser apps |
 
+## 🆚 REST vs GraphQL vs gRPC
+
+| Feature | REST | GraphQL | gRPC |
+|----------|------|----------|------|
+| **Main Use** | Standard web APIs | Flexible frontend queries | Fast backend communication |
+| **Data Format** | JSON | JSON | Protobuf (binary) |
+| **Human-readable** | ✅ Yes | ✅ Yes | ❌ No |
+| **Speed** | Medium | Medium | Very Fast |
+| **Browser-friendly** | Excellent | Excellent | Limited |
+| **Streaming** | Limited | Limited | Excellent |
+| **Learning Curve** | Easy | Medium | Medium/Hard |
+
 ---
 
 ## 📦 Real-world Use Cases
