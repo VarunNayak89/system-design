@@ -17,7 +17,18 @@ Two popular approaches are:
 - Responses are typically in JSON.
 
 ### 🧪 Example
-*(Example can be added here as needed.)*
+```http
+GET /users/1
+```
+
+```json
+{
+  "id": 1,
+  "name": "Varun",
+  "email": "varunbe09@gmail.com",
+  "age": 28
+}
+```
 
 ---
 
@@ -30,9 +41,65 @@ Two popular approaches are:
 - Supports queries, mutations, and subscriptions.
 
 ### 🧪 Example
-*(Example can be added here as needed.)*
+```graphql
+query {
+  user(id: 1) {
+    name
+    email
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "user": {
+      "name": "Varun",
+      "email": "varunbe09@gmail.com"
+    }
+  }
+}
+```
 
 ---
+
+## 🆚 REST vs GraphQL Endpoint Example
+
+| REST | GraphQL |
+|------|----------|
+| `/users/1` | `/graphql` |
+| `/orders/1` | `/graphql` |
+| `/products/5` | `/graphql` |
+| Multiple endpoints | Single endpoint |
+| Fixed response | Client chooses fields |
+
+### REST
+
+```http
+GET /users/1
+GET /orders/1
+GET /products/5
+```
+
+### GraphQL
+
+```graphql
+POST /graphql
+
+query {
+  user(id: 1) {
+    name
+  }
+
+  order(id: 1) {
+    total
+  }
+
+  product(id: 5) {
+    title
+  }
+}
+```
 
 ## 📊 REST vs GraphQL Comparison
 
