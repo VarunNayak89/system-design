@@ -1,0 +1,362 @@
+# 📘 Resilience Patterns Summary
+
+---
+
+## 🔧 What is Resilience?
+
+Resilience is the ability of a system to continue operating and recover gracefully when failures occur.
+
+In distributed systems, failures are inevitable due to:
+
+* Network issues
+* Service outages
+* Database failures
+* Invalid messages
+* High traffic spikes
+
+Resilience patterns help systems remain available, reliable, and fault-tolerant.
+
+---
+
+## 🎯 Why Do We Need Resilience?
+
+Without resilience:
+
+* One service failure can bring down the entire system
+* Failed messages may be lost
+* Users experience downtime
+* Systems become unstable under load
+
+Resilience patterns ensure:
+
+✅ High Availability
+
+✅ Fault Tolerance
+
+✅ Graceful Recovery
+
+✅ Better User Experience
+
+---
+
+# 🔄 Retry Pattern
+
+## 📖 Definition
+
+The Retry Pattern automatically retries an operation that failed due to a temporary (transient) issue.
+
+Instead of failing immediately, the application waits and tries again.
+
+---
+
+## 🎯 Use Cases
+
+* Network timeout
+* Temporary database outage
+* API rate limiting
+* Service temporarily unavailable
+
+---
+
+## ⚙️ Retry Strategies
+
+| Strategy                     | Description                              |
+| ---------------------------- | ---------------------------------------- |
+| Fixed Retry                  | Retry after a fixed interval             |
+| Exponential Backoff          | Retry delay increases after each failure |
+| Exponential Backoff + Jitter | Adds randomness to prevent retry storms  |
+
+---
+
+## 📊 Example
+
+```text
+Client
+  |
+  v
+Payment Service
+     |
+     X Timeout
+     |
+Retry #1
+Retry #2
+Retry #3
+```
+
+---
+
+## ✅ Benefits
+
+* Handles temporary failures automatically
+* Improves reliability
+* Reduces manual intervention
+
+---
+
+## ⚠️ Risks
+
+* Can overload unhealthy services
+* May create duplicate operations
+
+### Solution
+
+Use **Idempotency Keys**
+
+```text
+Request + Idempotency Key
+        |
+        v
+Process Once Only
+```
+
+---
+
+# 💀 Dead Letter Queue (DLQ)
+
+## 📖 Definition
+
+A Dead Letter Queue (DLQ) is a special queue that stores messages that cannot be processed successfully after all retry attempts have been exhausted.
+
+Instead of blocking the system, failed messages are moved to the DLQ for later investigation.
+
+---
+
+## 🎯 Use Cases
+
+* Invalid message format
+* Missing required fields
+* Corrupted data
+* Permanent business rule violations
+
+---
+
+## 📊 Flow
+
+```text
+Producer
+   |
+   v
+Main Queue
+   |
+   v
+Consumer
+   |
+   +--> Retry #1
+   +--> Retry #2
+   +--> Retry #3
+   |
+   v
+  DLQ
+```
+
+---
+
+## Example Message
+
+```json
+{
+  "orderId": null,
+  "amount": 100
+}
+```
+
+Message repeatedly fails validation and is moved to DLQ.
+
+---
+
+## ✅ Benefits
+
+* Prevents poison messages from blocking queues
+* Preserves failed messages
+* Enables troubleshooting and replay
+
+---
+
+## ⚙️ Common Technologies
+
+| Technology        | DLQ Support          |
+| ----------------- | -------------------- |
+| Azure Service Bus | Built-in DLQ         |
+| RabbitMQ          | Dead Letter Exchange |
+| Kafka             | Dead Letter Topic    |
+| Amazon SQS        | DLQ                  |
+
+---
+
+# 🚦 Circuit Breaker Pattern
+
+## 📖 Definition
+
+A Circuit Breaker prevents requests from continuously hitting an unhealthy service.
+
+Instead of repeatedly calling a failing service, the circuit "opens" and immediately returns an error or fallback response.
+
+---
+
+## 🎯 Use Cases
+
+* Downstream service outage
+* Slow APIs
+* Database failures
+* Third-party service failures
+
+---
+
+## 🔄 Circuit Breaker States
+
+| State     | Description                                   |
+| --------- | --------------------------------------------- |
+| Closed    | Requests flow normally                        |
+| Open      | Requests fail immediately                     |
+| Half-Open | Limited requests are allowed to test recovery |
+
+---
+
+### 🟢 Closed State
+
+```text
+Client ---> Service
+```
+
+Service is healthy.
+
+---
+
+### 🔴 Open State
+
+```text
+Client ---> Circuit Breaker
+               |
+               X
+            Service
+```
+
+Service is unhealthy.
+
+No requests are sent.
+
+---
+
+### 🟡 Half-Open State
+
+```text
+Client ---> Circuit Breaker
+               |
+               v
+            Service
+```
+
+A small number of requests test whether the service has recovered.
+
+---
+
+## ✅ Benefits
+
+* Prevents cascading failures
+* Protects downstream services
+* Improves overall system stability
+
+---
+
+## ⚙️ Popular Libraries
+
+| Platform      | Library      |
+| ------------- | ------------ |
+| .NET          | Polly        |
+| Java          | Resilience4j |
+| Java (Legacy) | Hystrix      |
+
+---
+
+# 📊 Resilience Patterns Comparison
+
+| Pattern         | Purpose                           | Best For                         | Handles                  | Key Benefit                 |
+| --------------- | --------------------------------- | -------------------------------- | ------------------------ | --------------------------- |
+| Retry           | Reattempt failed operations       | Temporary failures               | Timeouts, network issues | Automatic recovery          |
+| DLQ             | Store permanently failed messages | Message processing               | Invalid messages         | Prevents queue blockage     |
+| Circuit Breaker | Stop calls to failing services    | Service-to-service communication | Service outages          | Prevents cascading failures |
+
+---
+
+# 🔹 How They Work Together
+
+```text
+                    +----------------+
+                    | Order Service  |
+                    +----------------+
+                             |
+                             v
+                    +----------------+
+                    | Message Queue  |
+                    +----------------+
+                             |
+                             v
+                    +----------------+
+                    |   Consumer     |
+                    +----------------+
+                             |
+                     Retry Logic
+                             |
+                 +-----------+-----------+
+                 |                       |
+              Success                 Failure
+                                         |
+                                         v
+                                      DLQ
+
+                             |
+                             v
+
+                    +----------------+
+                    | Circuit Breaker|
+                    +----------------+
+                             |
+                             v
+                    +----------------+
+                    | Payment Service|
+                    +----------------+
+```
+
+---
+
+# 🧠 Interview Tips
+
+### Retry
+
+✅ Use for transient failures
+
+✅ Use exponential backoff
+
+✅ Add jitter
+
+---
+
+### DLQ
+
+✅ Never lose failed messages
+
+✅ Investigate and replay later
+
+✅ Common in event-driven systems
+
+---
+
+### Circuit Breaker
+
+✅ Prevent cascading failures
+
+✅ Protect downstream services
+
+✅ Common in microservices architectures
+
+---
+
+# 🎯 Key Takeaway
+
+**Retry** handles temporary failures.
+
+**DLQ** handles unrecoverable message failures.
+
+**Circuit Breaker** protects the system from cascading failures.
+
+Together, these patterns form the foundation of resilience in modern distributed systems and microservices architectures.
